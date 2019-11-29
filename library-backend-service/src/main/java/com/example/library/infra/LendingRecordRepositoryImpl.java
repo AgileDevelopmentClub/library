@@ -54,9 +54,17 @@ public class LendingRecordRepositoryImpl implements LendingRecordRepository {
 
     @Override
     public LendingRecord findById(Book book, User user) {
-        List<Map<String, Object>> maps = jdbcTemplate.queryForList("select * from LENDING_RECORD " +
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList("select * from LENDING_EVENT " +
                 "where isbn = '" + book.getIsbn() + "' " +
                 "and user_id = '" + user.getUserId() + "'");
+
+        List<Map<String, Object>> maps2 = jdbcTemplate.queryForList("select * from RETURN_EVENT " +
+                "where isbn = '" + book.getIsbn() + "' " +
+                "and user_id = '" + user.getUserId() + "'");
+
+        if (maps.size() <= maps2.size()){
+            return null;
+        }
         String isbn = (String)maps.get(0).get("isbn");
         String userId = (String)maps.get(0).get("user_id");
         return new LendingRecord(bookRepository.findById(isbn), userRepository.findById(userId));

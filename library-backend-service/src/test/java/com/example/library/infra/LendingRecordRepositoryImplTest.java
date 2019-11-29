@@ -35,14 +35,16 @@ class LendingRecordRepositoryImplTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.execute("Delete from LENDING_RECORD");
+        jdbcTemplate.execute("Delete from LENDING_EVENT");
+        jdbcTemplate.execute("Delete from RETURN_EVENT");
         jdbcTemplate.execute("Delete from BOOK");
         jdbcTemplate.execute("Delete from USERR");
     }
 
     @AfterEach
     void tearDown() {
-        jdbcTemplate.execute("Delete from LENDING_RECORD");
+        jdbcTemplate.execute("Delete from LENDING_EVENT");
+        jdbcTemplate.execute("Delete from RETURN_EVENT");
         jdbcTemplate.execute("Delete from BOOK");
         jdbcTemplate.execute("Delete from USERR");
     }
@@ -107,11 +109,58 @@ class LendingRecordRepositoryImplTest {
             LendingRecord entity = new LendingRecord(book, user);
 
             // WHEN
-            target.register(entity);
+            // target.register(entity);
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+
+
+            // THEN
+            LendingRecord actual = target.findById(book, user);
+            assertThat(actual).isEqualTo(null);
+        }
+
+        @DisplayName("単数の取得")
+        @Test
+        void findById_02() {
+            // GIVEN
+            bookRepository.register(new Book("9784567890978"));
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784567, 'aa@bb')");
+            Book book = new Book("9784567890978");
+            User user = new User("9784567", "aa@bb");
+            LendingRecord entity = new LendingRecord(book, user);
+
+            // WHEN
+            // target.register(entity);
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+
 
             // THEN
             LendingRecord actual = target.findById(book, user);
             assertThat(actual).isEqualTo(entity);
+        }
+
+        @DisplayName("単数の取得")
+        @Test
+        void findById_03() {
+            // GIVEN
+            bookRepository.register(new Book("9784567890978"));
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784567, 'aa@bb')");
+            Book book = new Book("9784567890978");
+            User user = new User("9784567", "aa@bb");
+            LendingRecord entity = new LendingRecord(book, user);
+
+            // WHEN
+            // target.register(entity);
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+
+
+            // THEN
+            LendingRecord actual = target.findById(book, user);
+            assertThat(actual).isEqualTo(null);
         }
 
         @DisplayName("複数の取得")

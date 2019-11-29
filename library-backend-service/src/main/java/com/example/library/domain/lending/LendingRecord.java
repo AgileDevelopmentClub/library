@@ -26,6 +26,7 @@ public final class LendingRecord {
     // よくわからなかったのでヘルプください
     @Override
     public boolean equals(Object other) {
+        if(other == null) return false;
         if (!(other instanceof LendingRecord)) throw new RuntimeException("Lending Record同士で比較してくれ");
         LendingRecord otherLendingRecord = (LendingRecord) other;
         return this.book.equals(otherLendingRecord.book) &&
