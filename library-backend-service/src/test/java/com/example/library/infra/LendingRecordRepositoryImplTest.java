@@ -136,10 +136,11 @@ class LendingRecordRepositoryImplTest {
 //             THEN
             List<LendingRecord> actual = target.findAll();
             softly.assertThat(actual).hasSize(3);
-            // TODO 順番があわずにアサートできなかった
-//            softly.assertThat(actual.get(0)).isEqualTo(entity1);
-//            softly.assertThat(actual.get(1)).isEqualTo(entity2);
-//            softly.assertThat(actual.get(2)).isEqualTo(entity3);
+            softly.assertThat(actual).containsExactlyInAnyOrder(
+                    entity1,
+                    entity2,
+                    entity3
+            );
             softly.assertAll();
         }
 
