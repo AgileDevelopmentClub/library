@@ -178,9 +178,9 @@ class LendingRecordRepositoryImplTest {
             LendingRecord entity3 = new LendingRecord(new Book("9784567890125"), new User("9784569", "ac@BB"));
 
             SoftAssertions softly = new SoftAssertions();
-            target.register(entity1);
-            target.register(entity2);
-            target.register(entity3);
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890124', '9784568')");
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890125', '9784569')");
 
 //             THEN
             List<LendingRecord> actual = target.findAll();

@@ -7,7 +7,9 @@ import com.example.library.domain.lending.LendingRecordRepository;
 import com.example.library.domain.user.User;
 import com.example.library.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -40,13 +42,26 @@ public class LendingRecordRepositoryImpl implements LendingRecordRepository {
 
     @Override
     public List<LendingRecord> findAll() {
-        String sql = "SELECT * FROM LENDING_RECORD";
-        List<Map<String, Object>> resultMap= jdbcTemplate.queryForList(sql);
+        String sql = "SELECT * FROM LENDING_EVENT";
+
+        RowMapper<LendingEvent> rm = new BeanPropertyRowMapper<LendingEvent>(LendingEvent.class);
+
+        List<LendingEvent> resultMap= jdbcTemplate.query(sql, rm);
+        String sql2 = "SELECT * FROM RETURN_EVENT";
+        List<Map<String, Object>> resultMap2= jdbcTemplate.queryForList(sql2);
+
+//        Map<String, Object> mapp = resultMap.get(0);
+//       new LendingEvent((String)mapp.get(""),mapp.get(""),mapp.get(""),mapp.get(""));
+
+
         ArrayList<LendingRecord> lendingRecords = new ArrayList<>();
-        for(Map<String, Object> map : resultMap) {
-            String isbn = (String) map.get("isbn");
-            String user_id = (String)map.get("user_id");
-            lendingRecords.add(new LendingRecord(bookRepository.findById(isbn), userRepository.findById(user_id)));
+//        for(Map<String, Object> map : resultMap) {
+//            String isbn = (String) map.get("isbn");
+//            String user_id = (String)map.get("user_id");
+//            lendingRecords.add(new LendingRecord(bookRepository.findById(isbn), userRepository.findById(user_id)));
+//        }
+        for(LendingEvent map : resultMap) {
+            lendingRecords.add(new LendingRecord(bookRepository.findById(map.getIsbn()), userRepository.findById(map.getUserId())));
         }
 
         return lendingRecords;
