@@ -182,6 +182,35 @@ class LendingRecordRepositoryImplTest {
             jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890124', '9784568')");
             jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890125', '9784569')");
 
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890124', '9784568')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890125', '9784569')");
+
+//             THEN
+            List<LendingRecord> actual = target.findAll();
+            softly.assertThat(actual).hasSize(0);
+            softly.assertAll();
+        }
+
+        @DisplayName("複数の取得")
+        @Test
+        void findAll_03() {
+            // GIVEN
+            bookRepository.register(new Book("9784567890978"));
+            bookRepository.register(new Book("9784567890124"));
+            bookRepository.register(new Book("9784567890125"));
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784567, 'aa@bb')");
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784568, 'ab@bb')");
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784569, 'ac@bb')");
+            LendingRecord entity1 = new LendingRecord(new Book("9784567890978"), new User("9784567", "aa@BB"));
+            LendingRecord entity2 = new LendingRecord(new Book("9784567890124"), new User("9784568", "ab@BB"));
+            LendingRecord entity3 = new LendingRecord(new Book("9784567890125"), new User("9784569", "ac@BB"));
+
+            SoftAssertions softly = new SoftAssertions();
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890124', '9784568')");
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890125', '9784569')");
+
 //             THEN
             List<LendingRecord> actual = target.findAll();
             softly.assertThat(actual).hasSize(3);
@@ -190,6 +219,65 @@ class LendingRecordRepositoryImplTest {
                     entity2,
                     entity3
             );
+            softly.assertAll();
+        }
+
+        @DisplayName("複数の取得")
+        @Test
+        void findAll_04() {
+            // GIVEN
+            bookRepository.register(new Book("9784567890978"));
+            bookRepository.register(new Book("9784567890124"));
+            bookRepository.register(new Book("9784567890125"));
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784567, 'aa@bb')");
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784568, 'ab@bb')");
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784569, 'ac@bb')");
+            LendingRecord entity1 = new LendingRecord(new Book("9784567890978"), new User("9784567", "aa@BB"));
+            LendingRecord entity2 = new LendingRecord(new Book("9784567890124"), new User("9784568", "ab@BB"));
+            LendingRecord entity3 = new LendingRecord(new Book("9784567890125"), new User("9784569", "ac@BB"));
+
+            SoftAssertions softly = new SoftAssertions();
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890124', '9784568')");
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890125', '9784569')");
+
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890124', '9784568')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890125', '9784569')");
+
+//             THEN
+            List<LendingRecord> actual = target.findAll();
+            softly.assertThat(actual).hasSize(1);
+            softly.assertThat(actual).containsExactlyInAnyOrder(
+                    entity1
+            );
+            softly.assertAll();
+        }
+
+        @Test
+        void findAll_05() {
+            // GIVEN
+            bookRepository.register(new Book("9784567890978"));
+            bookRepository.register(new Book("9784567890124"));
+            bookRepository.register(new Book("9784567890125"));
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784567, 'aa@bb')");
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784568, 'ab@bb')");
+            jdbcTemplate.execute("insert into USERR(user_id, email) values(9784569, 'ac@bb')");
+            LendingRecord entity1 = new LendingRecord(new Book("9784567890978"), new User("9784567", "aa@BB"));
+            LendingRecord entity2 = new LendingRecord(new Book("9784567890124"), new User("9784568", "ab@BB"));
+            LendingRecord entity3 = new LendingRecord(new Book("9784567890125"), new User("9784569", "ac@BB"));
+
+            SoftAssertions softly = new SoftAssertions();
+            jdbcTemplate.execute("insert into LENDING_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890978', '9784567')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890124', '9784568')");
+            jdbcTemplate.execute("insert into RETURN_EVENT(isbn, user_id) values('9784567890125', '9784569')");
+
+//             THEN
+            List<LendingRecord> actual = target.findAll();
+            softly.assertThat(actual).hasSize(0);
             softly.assertAll();
         }
 

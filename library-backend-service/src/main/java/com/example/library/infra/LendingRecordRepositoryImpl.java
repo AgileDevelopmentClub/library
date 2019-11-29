@@ -27,7 +27,7 @@ public class LendingRecordRepositoryImpl implements LendingRecordRepository {
     public void register(LendingRecord lendingRecord) {
         jdbcTemplate.execute("insert into lending_record(isbn, user_id) values('"
                 + lendingRecord.getBook().getIsbn()
-                + "','"+
+                + "','" +
                 lendingRecord.getUser().getUserId() + "')");
     }
 
@@ -46,9 +46,11 @@ public class LendingRecordRepositoryImpl implements LendingRecordRepository {
 
         RowMapper<LendingEvent> rm = new BeanPropertyRowMapper<LendingEvent>(LendingEvent.class);
 
-        List<LendingEvent> resultMap= jdbcTemplate.query(sql, rm);
+        List<LendingEvent> resultMap = jdbcTemplate.query(sql, rm);
         String sql2 = "SELECT * FROM RETURN_EVENT";
-        List<Map<String, Object>> resultMap2= jdbcTemplate.queryForList(sql2);
+        RowMapper<ReturnEvent> rm2 = new BeanPropertyRowMapper<ReturnEvent>(ReturnEvent.class);
+        List<ReturnEvent> resultMap2 = jdbcTemplate.query(sql2, rm2);
+//        List<Map<String, Object>> resultMap2= jdbcTemplate.queryForList(sql2);
 
 //        Map<String, Object> mapp = resultMap.get(0);
 //       new LendingEvent((String)mapp.get(""),mapp.get(""),mapp.get(""),mapp.get(""));
@@ -60,9 +62,25 @@ public class LendingRecordRepositoryImpl implements LendingRecordRepository {
 //            String user_id = (String)map.get("user_id");
 //            lendingRecords.add(new LendingRecord(bookRepository.findById(isbn), userRepository.findById(user_id)));
 //        }
-        for(LendingEvent map : resultMap) {
-            lendingRecords.add(new LendingRecord(bookRepository.findById(map.getIsbn()), userRepository.findById(map.getUserId())));
+
+        for (LendingEvent map : resultMap) {
+            String isbn = map.getIsbn();
+            String userId = map.getUserId();
+            boolean alreadyReturn = false;
+            for (ReturnEvent map2 : resultMap2) {
+                if (isbn.equals(map2.getIsbn()) && userId.equals(map2.getUserId())) {
+                    resultMap2.remove(map2);
+                    alreadyReturn = true;
+                    break;
+                }
+            }
+            if (!alreadyReturn) {
+                lendingRecords.add(new LendingRecord(bookRepository.findById(isbn), userRepository.findById(userId)));
+            }
         }
+//        for(ReturnEvent map : resultMap2) {
+//            lendingRecords.add(new LendingRecord(bookRepository.findById(map.getIsbn()), userRepository.findById(map.getUserId())));
+//        }
 
         return lendingRecords;
     }
@@ -77,11 +95,11 @@ public class LendingRecordRepositoryImpl implements LendingRecordRepository {
                 "where isbn = '" + book.getIsbn() + "' " +
                 "and user_id = '" + user.getUserId() + "'");
 
-        if (maps.size() <= maps2.size()){
+        if (maps.size() <= maps2.size()) {
             return null;
         }
-        String isbn = (String)maps.get(0).get("isbn");
-        String userId = (String)maps.get(0).get("user_id");
+        String isbn = (String) maps.get(0).get("isbn");
+        String userId = (String) maps.get(0).get("user_id");
         return new LendingRecord(bookRepository.findById(isbn), userRepository.findById(userId));
     }
 }
