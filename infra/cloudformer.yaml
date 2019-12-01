@@ -1,0 +1,278 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  KeyPair:
+    Description: Select KeyPair Name.
+    Type: AWS::EC2::KeyPair::KeyName
+  DBUser:
+    Type: String
+  DBPassword:
+    Type: String
+  DBNAME:
+    Type: String
+Resources:
+  vpc078b34358fbc6b100:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      InstanceTenancy: default
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'false'
+      Tags:
+        - Key: Name
+          Value: library-vpc
+  subnet0a1c50168c1678605:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+      Tags:
+        - Key: Name
+          Value: library-public-subnet-1a
+  subnet0f78affc490df5c6a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+      Tags:
+        - Key: Name
+          Value: library-private-subnet-1a
+  subnet0f39b07ae11b17a8b:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+      Tags:
+        - Key: Name
+          Value: library-private-subnet-1c
+  igw025e32db6e0afd622:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: library-vpc
+  dopt74517613:
+    Type: AWS::EC2::DHCPOptions
+    Properties:
+      DomainName: ap-northeast-1.compute.internal
+      DomainNameServers:
+        - AmazonProvidedDNS
+  acl0255e8cf1d51e6d94:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+  rtb036beba6e09664b43:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+      Tags:
+        - Key: Name
+          Value: library-public-rt
+  rtb0a61a6aa88a3aee2e:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+  rtb08f9e8c86917a3690:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+      Tags:
+        - Key: Name
+          Value: library-private-rt
+  eip18179149164:
+    Type: AWS::EC2::EIP
+    DependsOn:
+      - gw1
+    Properties:
+      Domain: vpc
+  instancei00122d05998510578:
+    Type: AWS::EC2::Instance
+    Properties:
+      DisableApiTermination: 'false'
+      InstanceInitiatedShutdownBehavior: stop
+      #      IamInstanceProfile: arn:aws:iam::555965179337:instance-profile/library-ec2-codedeploy-role
+      ImageId: ami-068a6cefc24c301d2
+      InstanceType: t2.micro
+      KeyName:
+        Ref: KeyPair
+      Monitoring: 'false'
+      Tags:
+        - Key: Name
+          Value: library-web-1a
+      NetworkInterfaces:
+        - DeleteOnTermination: 'true'
+          Description: Primary network interface
+          DeviceIndex: 0
+          SubnetId: !Ref 'subnet0a1c50168c1678605'
+          PrivateIpAddresses:
+            - PrivateIpAddress: 10.0.1.95
+              Primary: 'true'
+          GroupSet:
+            - !Ref 'sglibrarywebsg'
+  rdslibrary:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: '20'
+      AllowMajorVersionUpgrade: 'false'
+      AutoMinorVersionUpgrade: 'true'
+      DBInstanceClass: db.t2.micro
+      Port: '5432'
+      StorageType: gp2
+      BackupRetentionPeriod: '7'
+      MasterUsername:
+        Ref: DBUser
+      MasterUserPassword:
+        Ref: DBPassword
+      PreferredBackupWindow: 14:24-14:54
+      PreferredMaintenanceWindow: sat:17:37-sat:18:07
+      DBName:
+        Ref: DBNAME
+      Engine: postgres
+      EngineVersion: '11.5'
+      LicenseModel: postgresql-license
+      DBSubnetGroupName: !Ref 'dbsubnetdefaultvpc078b34358fbc6b100'
+      VPCSecurityGroups:
+        - !Ref 'sglibrarydbsg'
+  dbsubnetdefaultvpc078b34358fbc6b100:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Created from the RDS Management Console
+      SubnetIds:
+        - !Ref 'subnet0f39b07ae11b17a8b'
+        - !Ref 'subnet0f78affc490df5c6a'
+        - !Ref 'subnet0a1c50168c1678605'
+  sglibrarydbsg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: library-db-sg
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+  sglibrarywebsg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: library-web-sg
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+  acl1:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: '0.0.0.0/0'
+      Egress: 'true'
+      Protocol: '-1'
+      RuleAction: allow
+      RuleNumber: '100'
+      NetworkAclId: !Ref 'acl0255e8cf1d51e6d94'
+  acl2:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: '0.0.0.0/0'
+      Protocol: '-1'
+      RuleAction: allow
+      RuleNumber: '100'
+      NetworkAclId: !Ref 'acl0255e8cf1d51e6d94'
+  subnetacl1:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref 'acl0255e8cf1d51e6d94'
+      SubnetId: !Ref 'subnet0f78affc490df5c6a'
+  subnetacl2:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref 'acl0255e8cf1d51e6d94'
+      SubnetId: !Ref 'subnet0f39b07ae11b17a8b'
+  subnetacl3:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref 'acl0255e8cf1d51e6d94'
+      SubnetId: !Ref 'subnet0a1c50168c1678605'
+  gw1:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+      InternetGatewayId: !Ref 'igw025e32db6e0afd622'
+  subnetroute1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref 'rtb036beba6e09664b43'
+      SubnetId: !Ref 'subnet0a1c50168c1678605'
+  subnetroute3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref 'rtb08f9e8c86917a3690'
+      SubnetId: !Ref 'subnet0f39b07ae11b17a8b'
+  subnetroute4:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref 'rtb08f9e8c86917a3690'
+      SubnetId: !Ref 'subnet0f78affc490df5c6a'
+  route1:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      RouteTableId: !Ref 'rtb036beba6e09664b43'
+      GatewayId: !Ref 'igw025e32db6e0afd622'
+    DependsOn: gw1
+  dchpassoc1:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      VpcId: !Ref 'vpc078b34358fbc6b100'
+      DhcpOptionsId: !Ref 'dopt74517613'
+  assoc1:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt 'eip18179149164.AllocationId'
+      InstanceId: !Ref 'instancei00122d05998510578'
+  ingress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'sglibrarydbsg'
+      IpProtocol: tcp
+      FromPort: '5432'
+      ToPort: '5432'
+      SourceSecurityGroupId: !Ref 'sglibrarywebsg'
+      SourceSecurityGroupOwnerId: '555965179337'
+  ingress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'sglibrarywebsg'
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: '0.0.0.0/0'
+  ingress3:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'sglibrarywebsg'
+      IpProtocol: tcp
+      FromPort: '8080'
+      ToPort: '8080'
+      CidrIp: '0.0.0.0/0'
+  ingress4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'sglibrarywebsg'
+      IpProtocol: tcp
+      FromPort: '22'
+      ToPort: '22'
+      CidrIp: '0.0.0.0/0'
+  ingress5:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'sglibrarywebsg'
+      IpProtocol: tcp
+      FromPort: '443'
+      ToPort: '443'
+      CidrIp: '0.0.0.0/0'
+  egress1:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref 'sglibrarydbsg'
+      IpProtocol: '-1'
+      CidrIp: '0.0.0.0/0'
+  egress2:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref 'sglibrarywebsg'
+      IpProtocol: '-1'
+      CidrIp: '0.0.0.0/0'
+Description: library
