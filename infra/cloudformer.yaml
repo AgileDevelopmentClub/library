@@ -92,7 +92,6 @@ Resources:
     Properties:
       DisableApiTermination: 'false'
       InstanceInitiatedShutdownBehavior: stop
-      #      IamInstanceProfile: arn:aws:iam::555965179337:instance-profile/library-ec2-codedeploy-role
       ImageId: ami-068a6cefc24c301d2
       InstanceType: t2.micro
       KeyName:
@@ -111,6 +110,13 @@ Resources:
               Primary: 'true'
           GroupSet:
             - !Ref 'sglibrarywebsg'
+      UserData: !Base64
+        Fn::Sub: |
+          #!/bin/bash
+          yum -y update
+          echo "LANG=ja_JP.UTF-8" > /etc/sysconfig/i18n
+          yum install -y java-11-amazon-corretto
+          yum install -y  postgresql
   rdslibrary:
     Type: AWS::RDS::DBInstance
     Properties:
