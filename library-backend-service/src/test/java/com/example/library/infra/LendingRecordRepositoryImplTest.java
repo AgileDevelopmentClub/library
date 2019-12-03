@@ -1,18 +1,12 @@
 package com.example.library.infra;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.example.library.domain.book.Book;
 import com.example.library.domain.book.BookRepository;
 import com.example.library.domain.lending.LendingRecord;
 import com.example.library.domain.user.User;
 import com.example.library.domain.user.UserRepository;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 @SpringBootTest
@@ -41,7 +37,7 @@ class LendingRecordRepositoryImplTest {
     void setUp() {
         jdbcTemplate.execute("Delete from LENDING_EVENT");
         jdbcTemplate.execute("Delete from RETURN_EVENT");
-        jdbcTemplate.execute("Delete from LENDING_RECORD");
+//        jdbcTemplate.execute("Delete from LENDING_RECORD");
         jdbcTemplate.execute("Delete from BOOK");
         jdbcTemplate.execute("Delete from USERR");
     }
@@ -50,7 +46,7 @@ class LendingRecordRepositoryImplTest {
     void tearDown() {
         jdbcTemplate.execute("Delete from LENDING_EVENT");
         jdbcTemplate.execute("Delete from RETURN_EVENT");
-        jdbcTemplate.execute("Delete from LENDING_RECORD");
+//        jdbcTemplate.execute("Delete from LENDING_RECORD");
         jdbcTemplate.execute("Delete from BOOK");
         jdbcTemplate.execute("Delete from USERR");
     }
@@ -59,6 +55,7 @@ class LendingRecordRepositoryImplTest {
     @Nested
     class Insert {
 
+        @Disabled("lendingRecordをdropするのでdisabled")
         @Test
         void insert() {
             // Arrange
@@ -121,6 +118,7 @@ class LendingRecordRepositoryImplTest {
     @DisplayName("delete")
     @Nested
     class dlete {
+        @Disabled("lendingRecordをdropするのでdisabled")
         @Test
         void dlete01() {
             // GIVEN
@@ -149,6 +147,7 @@ class LendingRecordRepositoryImplTest {
     @DisplayName("find")
     @Nested
     class find {
+        @Disabled("lendingRecordをdropするのでdisabled")
         @DisplayName("単数の取得")
         @Test
         void findById_01() {
@@ -167,7 +166,7 @@ class LendingRecordRepositoryImplTest {
             assertThat(actual).isEqualTo(entity);
         }
 
-
+        @Disabled("lendingRecordをdropするのでdisabled")
         @DisplayName("複数の取得")
         @Test
         void findAllForEvent() {
@@ -190,10 +189,11 @@ class LendingRecordRepositoryImplTest {
 //             THEN
             List<LendingRecord> actual = target.findAll();
             softly.assertThat(actual).hasSize(3);
-            // TODO 順番があわずにアサートできなかった
-//            softly.assertThat(actual.get(0)).isEqualTo(entity1);
-//            softly.assertThat(actual.get(1)).isEqualTo(entity2);
-//            softly.assertThat(actual.get(2)).isEqualTo(entity3);
+            softly.assertThat(actual).containsExactlyInAnyOrder(
+              entity1,
+              entity2,
+              entity3
+            );
             softly.assertAll();
         }
 
