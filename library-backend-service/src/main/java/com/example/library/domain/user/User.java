@@ -15,9 +15,8 @@ public class User {
     private String givenName;
 
     public User(String userId, String email, String familyName, String givenName) {
-        if (userId.length() > 7) {
-            throw new BusinessException("userIdは７桁");
-        }
+        validate(userId);
+
         this.userId = userId;
         this.email = email;
         this.familyName = familyName;
@@ -25,18 +24,28 @@ public class User {
     }
 
     public User(String userId, String email) {
-        if (userId.length() > 7) {
-            throw new BusinessException("userIdは７桁");
-        }
+        validate(userId);
+
         this.userId = userId;
         this.email = email;
     }
 
     public User(String userId) {
+        validate(userId);
+
+        this.userId = userId;
+    }
+
+    /**
+     * ユーザIDが7桁以上であることを確認する。
+     * 【不変条件】
+     *
+     * @param userId ユーザID
+     */
+    private void validate(String userId) {
         if (userId.length() > 7) {
             throw new BusinessException("userIdは７桁");
         }
-        this.userId = userId;
     }
 
     @Override
