@@ -35,8 +35,8 @@ public class LendingRecords implements LendingRecordsApi{
         // TODO => DTOとエンティティの区別がいらない
         // TODO => リポジトリもいらない　＝＞　レンディングレコードとは毎回作られるもの
         List<LendingRecord> result = service.searchForEvent();
-        LendingRecordsDto LendingRecords = convertSearchResult(result);
-        return new ResponseEntity<>(LendingRecords, OK);
+        LendingRecordsDto lendingRecords = convertSearchResult(result);
+        return new ResponseEntity<>(lendingRecords, OK);
     }
 
     /**
