@@ -1,6 +1,5 @@
 package com.example.library.infra.dto;
 
-import com.example.library.domain.lending.LendingRecord;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
