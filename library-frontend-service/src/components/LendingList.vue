@@ -25,7 +25,7 @@ import Isbn from '@/class/Isbn';
 import customConfiguration = Constant.customConfiguration;
 
 @Component
-export default class BookList extends Vue {
+export default class LendingList extends Vue {
   lendingRecords: Array<LendingRecord> = [];
 
   headers: any = [

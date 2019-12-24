@@ -1,12 +1,12 @@
 <template>
-    <BookList/>
+    <LendingList/>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import LendingList from '@/components/LendingList.vue';
 @Component({
-  components: { BookList: LendingList },
+  components: { LendingList },
 })
-export default class BooksInventoryView extends Vue {
+export default class LendingListView extends Vue {
 }
 </script>
