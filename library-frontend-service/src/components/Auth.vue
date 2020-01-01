@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Firebase from '@/firebase';
+import Firebase from '@/class/firebase';
 
 @Component
 export default class Auth extends Vue {

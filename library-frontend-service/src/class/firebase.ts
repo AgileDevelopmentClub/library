@@ -1,5 +1,6 @@
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/analytics';
 
 const config = {
   apiKey: 'AIzaSyBU71DQsVUEr3n6qLEaTGTapjmrwQqOspE',
@@ -18,6 +19,7 @@ let userStatus : boolean = false;
 export default {
   init(): void {
     firebase.initializeApp(config);
+    firebase.analytics();
     firebase
       .auth()
       .setPersistence(
