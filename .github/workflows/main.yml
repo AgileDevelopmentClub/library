@@ -44,27 +44,3 @@ jobs:
         working-directory: ./library-frontend-service
         run: |
           ./node_modules/.bin/firebase deploy --token=${{ secrets.FIREBASE_TOKEN }}
-
-  frontCheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: yarn install
-        run:  sudo apt-get update && sudo apt-get install yarn
-        working-directory: ./library-frontend-service
-      - name: package install
-        run:  yarn
-        working-directory: ./library-frontend-service
-      - name: lint
-        run:  yarn lint:output
-        working-directory: ./library-frontend-service
-      - name: test
-        run:  yarn test:unit:cov
-        working-directory: ./library-frontend-service
-      - name: SonarCloudScan
-        uses: sonarsource/sonarcloud-github-action@master
-        with:
-          projectBaseDir: ./library-frontend-service
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.GITHUB_FRONT_SONAR }}
