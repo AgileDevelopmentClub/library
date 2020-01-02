@@ -8,12 +8,13 @@ import com.example.library.infra.dto.LendingEvent;
 import com.example.library.infra.dto.ReturnEvent;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -25,22 +26,38 @@ public class LendingEventRepositoryImpl implements LendingEventRepository {
 
     @Override
     public void registerForLendingEvent(LendingEvent lendingEvent) {
-        jdbcTemplate.execute("insert into lending_event(isbn, user_id, lending_date) values('"
-                + lendingEvent.getIsbn()
-                + "','"
-                + lendingEvent.getUserId()
-                + "','" +
-                lendingEvent.getLendingDate() + "')");
+        String sql = "insert into lending_event(isbn, user_id, lending_date) values(?,?,?)";
+
+        PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(sql);
+        pscFactory.addParameter(new SqlParameter(Types.VARCHAR));
+        pscFactory.addParameter(new SqlParameter(Types.VARCHAR));
+        pscFactory.addParameter(new SqlParameter(Types.TIMESTAMP));
+        PreparedStatementCreator psc = pscFactory.newPreparedStatementCreator(
+                Arrays.asList(
+                        lendingEvent.getIsbn(),
+                        lendingEvent.getUserId(),
+                        lendingEvent.getLendingDate()
+                ));
+
+        jdbcTemplate.update(psc);
     }
 
     @Override
     public void registerForReturnEvent(LendingEvent lendingEvent) {
-        jdbcTemplate.execute("insert into return_event(isbn, user_id, return_date) values('"
-                + lendingEvent.getIsbn()
-                + "','"
-                + lendingEvent.getUserId()
-                + "','" +
-                LocalDateTime.now() + "')");
+       String sql = "insert into return_event(isbn, user_id, return_date) values(?,?,?)";
+
+        PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(sql);
+        pscFactory.addParameter(new SqlParameter(Types.VARCHAR));
+        pscFactory.addParameter(new SqlParameter(Types.VARCHAR));
+        pscFactory.addParameter(new SqlParameter(Types.TIMESTAMP));
+        PreparedStatementCreator psc = pscFactory.newPreparedStatementCreator(
+                Arrays.asList(
+                        lendingEvent.getIsbn(),
+                        lendingEvent.getUserId(),
+                        LocalDateTime.now()
+                ));
+
+        jdbcTemplate.update(psc);
     }
 
     @Override
