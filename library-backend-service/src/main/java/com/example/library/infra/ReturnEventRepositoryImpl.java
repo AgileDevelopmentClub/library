@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class ReturnEventRepositoryImpl implements ReturnEventRepository {
 
     @Override
     public List<ReturnEvent> findAll() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
