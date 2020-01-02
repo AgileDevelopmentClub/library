@@ -47,7 +47,7 @@ jobs:
         working-directory: ./library-frontend-service
         run: yarn sonar-scanner
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_FRONT_SONAR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_FRONT_SONAR }}
       - name: deploy to Firebase Hosting
         working-directory: ./library-frontend-service
         run: |
