@@ -13,7 +13,8 @@
     "generateAll": "run-p generate:*",
     "generate:ts": "openapi-generator generate -i ../reference/index.yaml -g typescript-axios -o ./client/generated",
     "generate:java": "openapi-generator generate -i ../reference/index.yaml -g spring -o ./server/generated --additional-properties dateLibrary=java8-localdatetime,interfaceOnly=true,skipDefaultInterface=true",
-    "generate:external": "openapi-generator generate -i ../reference/external/openBd.yaml -g typescript-axios -o ./client/generated/external"
+    "generate:external": "openapi-generator generate -i ../reference/external/openBd.yaml -g typescript-axios -o ./client/generated/external",
+    "sonar-scanner": "node_modules/sonar-scanner/bin/sonar-scanner"
   },
   "dependencies": {
     "axios": "^0.19.0",
@@ -43,6 +44,7 @@
     "npm-run-all": "^4.1.5",
     "sass": "^1.19.0",
     "sass-loader": "^8.0.0",
+    "sonar-scanner": "^3.1.0",
     "typescript": "~3.5.3",
     "vue-cli-plugin-vuetify": "^1.1.1",
     "vue-template-compiler": "^2.6.10",
