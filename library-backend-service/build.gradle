@@ -59,6 +59,7 @@ sonarqube {
         property "sonar.organization", "agiledevelopmentclub"
         property "sonar.login", "259aab5a38d819bdabe20dd61f17ba4008fd046c"
         property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
+        property "sonar.exclusions", "**/dto/**"
     }
 }
 
