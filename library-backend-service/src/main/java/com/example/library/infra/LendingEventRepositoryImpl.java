@@ -44,7 +44,7 @@ public class LendingEventRepositoryImpl implements LendingEventRepository {
 
     @Override
     public void registerForReturnEvent(LendingEvent lendingEvent) {
-       String sql = "insert into return_event(isbn, user_id, return_date) values(?,?,?)";
+        String sql = "insert into return_event(isbn, user_id, return_date) values(?,?,?)";
 
         PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(sql);
         pscFactory.addParameter(new SqlParameter(Types.VARCHAR));
@@ -103,11 +103,21 @@ public class LendingEventRepositoryImpl implements LendingEventRepository {
 
     @Override
     public List<LendingEvent> find(String isbn, String userId) {
-        String sql = "SELECT isbn, user_id, lending_date FROM LENDING_EVENT " +
-                "where isbn = '" + isbn + "' " +
-                "AND user_id = '" + userId + "'";
-        BeanPropertyRowMapper<LendingEvent> lendingEventBeanPropertyRowMapper = new BeanPropertyRowMapper<>(LendingEvent.class);
-        return jdbcTemplate.query(sql, lendingEventBeanPropertyRowMapper);
+        String sql =
+                "SELECT isbn, user_id, lending_date FROM LENDING_EVENT " +
+                        "where isbn = ?" +
+                        "AND user_id = ?";
+
+        PreparedStatementCreatorFactory pscFactory = new PreparedStatementCreatorFactory(sql);
+        pscFactory.addParameter(new SqlParameter(Types.VARCHAR));
+        pscFactory.addParameter(new SqlParameter(Types.VARCHAR));
+        PreparedStatementCreator psc = pscFactory.newPreparedStatementCreator(
+                Arrays.asList(isbn, userId)
+        );
+        BeanPropertyRowMapper<LendingEvent> rowMapper = new BeanPropertyRowMapper<>(LendingEvent.class);
+
+        return jdbcTemplate.query(psc, rowMapper);
+
     }
 
     private void addRecord(ArrayList<LendingRecord> lendingRecords, LendingEvent lendingMap) {
